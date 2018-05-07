@@ -24,11 +24,11 @@ PROGRAM parada
 
   INTEGER, PARAMETER::SP = SELECTED_INT_KIND(r=8)
   INTEGER, PARAMETER::DP = SELECTED_REAL_KIND(12,100)
-  INTEGER(KIND=SP):: i, ie
-  INTEGER(KIND=SP)::np
+  INTEGER(KIND=SP):: i, ie, ij
+  INTEGER(KIND=SP)::np, nt1, nt2
 
   REAL(KIND=DP):: inicio,final
-  REAL(KIND=DP), ALLOCATABLE, DIMENSION(:,:):: Conv
+  REAL(KIND=DP), ALLOCATABLE, DIMENSION(:,:):: Conv, g, x, y, rg, xx, yy, cab
   REAL(KIND=DP), PARAMETER::pi=3.141592653
   
   CALL CPU_TIME(inicio)
@@ -41,67 +41,20 @@ PROGRAM parada
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!LENDO OS ARQUIVOS DE ENTRADA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  READ(1,22)
 
 
-
-READ(2,15) cab    ! lê cabeçalho e armazena em cab
-READ(2,15) cab    ! lê linha em branco abaixo do cabeçalho e armazena em cab
-
- ie=1
-DO WHILE (.TRUE.)
-  READ(2,*,END=8) rg(ie,1)
-  ie=ie+1
-END DO
-8 CONTINUE
-CLOSE(2)
-
-np=ie-1  ! numero de pontos da entrada
-WRITE(6,*) "n de dados de entrada",np
-WRITE(6,*)'coordenada dos pontos'
-
-DO i=1,np
-  WRITE(6,*) g(i,1),'    ',g(i,2)
-END DO
 
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!LENDO OS ARQUIVOS DOS GRUPOS!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!FORMATO DOS ARQUIVOS DE SAÍDA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-ij=1
-DO WHILE (.TRUE.)
-  READ(1,*,end=9) x(ij,1),y(ij,2)
-  ij=ij+1
-END DO
-9 CONTINUE
-CLOSE(1)
-
-nt1=ij-1 !número de dados do grupo1
-WRITE(6,*) "n de dados do grupo 1",nt1
-
-ij=1
-DO WHILE (.TRUE.)
-  READ(4,*,END=10) tr2(ij,1),tr2(ij,2),a1
-  ij=ij+1
-END DO
-10 CONTINUE
-CLOSE(4)
- 
- nt2=ij-1 !número de dados do grupo1
-
-WRITE(6,*) "n de dados do grupo 2",nt2
-
-Conv=0d0 
-
-ALLOCATE(Conv1(np,2))
-   
-
-  CLOSE(1)
-  CLOSE(2)
-
-  ! Formatos dos arquivos de saida
+  15 FORMAT(A9,5x,A6,6x,A4,2x,A4,7x,A4,7x,A3,8x,A3)
   21 FORMAT(A9,2x,E12.2)
-  22 FORMAT(A20,2x,I10)
+  22 FORMAT(A1,1x,A1)
+
+!------------------------------------------------------------------------------!
 
   CALL CPU_TIME(final)
   PRINT*,'tempo de máquina=',final-inicio
