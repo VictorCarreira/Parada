@@ -1,4 +1,4 @@
-PROGRAM parada
+PROGRAM MQNL
 
     !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++!
     !Programa do teste do critério de parada da RNA                              !
@@ -9,7 +9,8 @@ PROGRAM parada
     !Calcular A, B e C através do método dos mínimos quadrados não lineares, de  !
     !            modo a ajustar os dados abaixo a uma função exponencial do tipo:!
     !            y=A.{e}^{−Bx}+C.                                                !
-    !            Fazer uma rotina em FORTRAN para ser futuramente aproveitada    !
+    !            Fazer uma rotina em FORTRAN para ser futuramente aproveitada no !
+    !            critério de parada de uma rede                                  !
     !Para usar compilação com flags utilize:                                     !
     !gfortran -fbounds-check -fbacktrace -Wall -Wextra -pedantic                 !
     !"pasta/subpasta/nomedopragrama.f95" -o nomedoexecutável                     !
@@ -24,25 +25,39 @@ PROGRAM parada
 
   INTEGER, PARAMETER::SP = SELECTED_INT_KIND(r=8)
   INTEGER, PARAMETER::DP = SELECTED_REAL_KIND(12,100)
-  INTEGER(KIND=SP):: i, ie, ij
-  INTEGER(KIND=SP)::np, nt1, nt2
+  INTEGER(KIND=SP):: ie
+  INTEGER(KIND=SP):: neq, npar
 
   REAL(KIND=DP):: inicio,final
-  REAL(KIND=DP), ALLOCATABLE, DIMENSION(:,:):: Conv, g, x, y, rg, xx, yy, cab
-  REAL(KIND=DP), PARAMETER::pi=3.141592653
+  REAL(KIND=DP), ALLOCATABLE, DIMENSION(:):: f, p, f1, p0, x
+  REAL(KIND=DP), ALLOCATABLE, DIMENSION(:,:):: A, AT, ATA, C
+  !REAL(KIND=DP), PARAMETER::
   
   CALL CPU_TIME(inicio)
-
-
-   OPEN(1,FILE='Dado.csv')
-   OPEN(2,FILE='Saida.csv')
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!LENDO OS ARQUIVOS DE ENTRADA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  READ(1,22)
+  
+   OPEN(1,FILE='dado.txt')
+   OPEN(2,FILE='saida.txt')
 
+   
+  
+   ie=1  !Contador do dado de entrada
+   DO WHILE (.TRUE.)
+     READ(1,*,END=8) x(ie), f(ie) 
+     ie=ie+1
+   END DO
+ 8   CONTINUE
+   CLOSE(1)
+
+
+   npar=3 ! A, B e C
+   neq= ie-1 ! Número de eq. do sistema não-lienar
+  
+   ALLOCATE(A(neq,npar),AT(npar,neq),ATA(npar,npar),C(npar,neq))
+   ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
 
 
 
@@ -50,9 +65,9 @@ PROGRAM parada
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!FORMATO DOS ARQUIVOS DE SAÍDA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  15 FORMAT(A9,5x,A6,6x,A4,2x,A4,7x,A4,7x,A3,8x,A3)
-  21 FORMAT(A9,2x,E12.2)
-  22 FORMAT(A1,1x,A1)
+!  15 FORMAT(A9,5x,A6,6x,A4,2x,A4,7x,A4,7x,A3,8x,A3)
+!  21 FORMAT(A9,2x,E12.2)
+!  22 FORMAT(A1,1x,A1)
 
 !------------------------------------------------------------------------------!
 
@@ -85,4 +100,4 @@ PROGRAM parada
 
 
 
-END PROGRAM parada
+END PROGRAM MQNL
