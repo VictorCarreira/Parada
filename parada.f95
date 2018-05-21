@@ -60,8 +60,6 @@ PROGRAM MQNL
    ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
 
     WRITE(6,*)"A=", A
-    !PRINT 21, x
-    !PRINT 20, ie
 
     A0=55d0 ! valores iniciais do parâmetro A
     B0=0.110d0 ! valores iniciais do parâmetro B
@@ -106,7 +104,7 @@ PROGRAM MQNL
 
 
       DO i=1,neq
-      f1(i)=A0*EXP(-B0*x(i))+C0 - f(i)  ! determinação do vetor f1
+       f1(i)=A0*EXP(-B0*x(i))+C0 - f(i)  ! determinação do vetor f1
       END DO 
       
       DO j=1,npar
