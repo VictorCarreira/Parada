@@ -28,7 +28,7 @@ PROGRAM MQNL
   INTEGER(KIND=SP):: ie,jj,i,j,k
   INTEGER(KIND=SP):: neq, npar,nit
 
-  REAL(KIND=DP):: inicio,final, A0, B0, C0, soma
+  REAL(KIND=DP):: inicio,final, A0, B0, C0, soma, deriv
   REAL(KIND=DP), ALLOCATABLE, DIMENSION(:):: f, p, f1, p0, x
   REAL(KIND=DP), ALLOCATABLE, DIMENSION(:,:):: A, AT, ATA, C
   REAL(KIND=DP), PARAMETER:: lambda=0.9d0
@@ -55,11 +55,14 @@ PROGRAM MQNL
    nit=10000 ! número de iterações
    npar=3 ! A, B e C
    neq= ie-1 ! Número de eq. do sistema não-lienar
+   deriv=-1d0
   
    ALLOCATE(A(neq,npar),AT(npar,neq),ATA(npar,npar),C(npar,neq))
    ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
 
     WRITE(6,*)"A=", A
+
+   DO WHILE (deriv < -1d-6 .AND. neq < 1000) !laço do condicional. Ele estabelece o critério de parada
 
     A0=55d0 ! valores iniciais do parâmetro A
     B0=0.110d0 ! valores iniciais do parâmetro B
@@ -110,7 +113,7 @@ PROGRAM MQNL
       DO j=1,npar
       p(j)=0.d0
        DO i=1,neq
-       p(j)=p(j)+C(j,i)*f1(i) ! Multiplica C por Bz ... P=C.f
+         p(j)=p(j)+C(j,i)*f1(i) ! Multiplica C por Bz ... P=C.f
        END DO
       END DO
 
@@ -120,6 +123,8 @@ PROGRAM MQNL
 
 
       WRITE(6,23) jj,A0,B0,C0
+
+
       WRITE(6,*)"---FIM---"
 
     END DO ! Final do laço das iterações
@@ -137,14 +142,26 @@ PROGRAM MQNL
 
  PRINT*,'DQ=',soma
 
+ ! cálculo da derivada da função
+
+   deriv = A0*EXP(-B0*x(neq))*(-B0)
+
+   PRINT*,'derivada=',deriv
+
+   neq=neq+50 !Janela criada para o critério de parada. Este conceito otimiza o tempo de processamento
+
+  PRINT*,'neq=',neq
+
+ END DO ! Final do laço do condicional.
+
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!FORMATO DOS ARQUIVOS DE SAÍDA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   20 FORMAT(I3)
-   21 FORMAT(ES12.2)
-   22 FORMAT(ES12.2,1x,ES12.2)
+   !20 FORMAT(I3)
+   !21 FORMAT(ES12.2)
+   !22 FORMAT(ES12.2,1x,ES12.2)
    23 FORMAT(I2,2X,4f10.4)
 
 !------------------------------------------------------------------------------!
