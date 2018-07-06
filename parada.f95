@@ -47,14 +47,26 @@ PROGRAM MQNL
 !!!!!!!!!!!!!!!!!!!!!!!!!!LENDO OS ARQUIVOS DE ENTRADA!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
-   OPEN(1,FILE='dado.txt')
+   OPEN(1,FILE='conv.txt')
    OPEN(2,FILE='saida.txt')
 
+   nit=0
+   npar=0
+   neq=0
+   deriv=0
+ 
+    nit=20 ! número de iterações
+    npar=3 ! A, B e C
+    neq= ie-1 ! Número de eq. do sistema não-lienar
+    deriv=-1d0 ! Valor da derivada
    
+    ALLOCATE(A(neq,npar),AT(npar,neq),ATA(npar,npar),C(npar,neq))
+    ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
   
    ie=1  !Contador de linhas do dado de entrada
    DO WHILE (.TRUE.)
-     READ(1,*,END=8) ie
+     READ(1,*,END=8) x(ie),f(ie)
+     !PRINT*,'x=',x(ie),'y=',f(ie)
      ie=ie+1
    END DO
  8   CONTINUE
@@ -62,15 +74,7 @@ PROGRAM MQNL
 
   !CALL ENTRADA()
 
-   nit=10000 ! número de iterações
-   npar=3 ! A, B e C
-   neq= ie-1 ! Número de eq. do sistema não-lienar
-   deriv=-1d0 ! Valor da derivada
-  
-   ALLOCATE(A(neq,npar),AT(npar,neq),ATA(npar,npar),C(npar,neq))
-   ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
-
-    WRITE(6,*)"A=", A
+   neq=10
 
    DO WHILE (deriv < -1d-6 .AND. neq < 1000) !laço do condicional. Ele estabelece o critério de parada
 
@@ -133,9 +137,9 @@ PROGRAM MQNL
 
 
       WRITE(6,23) jj,A0,B0,C0
+ 
 
-
-      WRITE(6,*)"---FIM---"
+      !WRITE(6,*)"---FIM---"
 
     END DO ! Final do laço das iterações
 
@@ -159,9 +163,6 @@ PROGRAM MQNL
    PRINT*,'derivada=',deriv
 
    neq=neq+50 !Janela criada para o critério de parada. Este conceito otimiza o tempo de processamento
-
-  PRINT*,'neq=',neq
-
  END DO ! Final do laço do condicional.
 
 
@@ -172,7 +173,7 @@ PROGRAM MQNL
    !20 FORMAT(I3)
    !21 FORMAT(ES12.2)
    !22 FORMAT(ES12.2,1x,ES12.2)
-   23 FORMAT(I2,2X,4f10.4)
+   23 FORMAT(I5,2X,4f10.4)
 
 !------------------------------------------------------------------------------!
 
