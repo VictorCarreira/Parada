@@ -9,8 +9,6 @@ PROGRAM MQNL
     !Calcular A, B e C através do método dos mínimos quadrados não lineares, de  !
     !            modo a ajustar os dados abaixo a uma função exponencial do tipo:!
     !            y=A.{e}^{−Bx}+C.                                                !
-    !            Fazer uma rotina em FORTRAN para ser futuramente aproveitada no !
-    !            critério de parada de uma rede                                  !
     !Para usar compilação com flags utilize:                                     !
     !gfortran -fbounds-check -fbacktrace -Wall -Wextra -pedantic                 !
     !"pasta/subpasta/nomedopragrama.f95" -o nomedoexecutável                     !
@@ -18,7 +16,17 @@ PROGRAM MQNL
 
                           !***********TABELA DE VARIÁVEIS***********!
                           !Conv: matriz de dados de convergência da !
-                          !       rede                              !      
+                          !       rede                              !   
+                          !nit: número de iterações                 !
+                          !npar: número de parâmetros               !
+                          !neq: número de eq. do sistema não-lienar !
+                          !deriv: Valor da derivada                 ! 
+                          !A: matriz jacobiana                      !
+                          !AT: jacobiana transposta                 !
+                          !p: vetor de resíduos                     !
+                          !lambda: operador de lagrange ou suavidade!
+                          !f: função exponencial                    !
+                          !A0, B0 e C0: parâmetros do modelo        !     
                           !-----------------------------------------!
 
   IMPLICIT NONE
@@ -52,10 +60,12 @@ PROGRAM MQNL
  8   CONTINUE
    CLOSE(1)
 
+  !CALL ENTRADA()
+
    nit=10000 ! número de iterações
    npar=3 ! A, B e C
    neq= ie-1 ! Número de eq. do sistema não-lienar
-   deriv=-1d0
+   deriv=-1d0 ! Valor da derivada
   
    ALLOCATE(A(neq,npar),AT(npar,neq),ATA(npar,npar),C(npar,neq))
    ALLOCATE(x(neq),f(neq),p(npar),f1(neq),p0(npar))
@@ -171,7 +181,18 @@ PROGRAM MQNL
   !*******************************************************************************************!
   CONTAINS
 
-  
+     SUBROUTINE ENTRADA()
+     WRITE(*,*)'Entre com os parâmetros de inversão do modelo'
+     WRITE(*,*) "Número de iterações="
+     READ(*,*) nit
+     WRITE(*,*) "Número de parâmetros="
+     READ(*,*) npar
+     WRITE(*,*) "Derivada="
+     READ(*,*) deriv
+     
+     END SUBROUTINE ENTRADA  
+
+     
 
      SUBROUTINE INVERT(A,i)
         integer i,im,j,k,l
